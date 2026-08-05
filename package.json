@@ -20,7 +20,6 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@red-cup-engineering/ni-uri-services-section": "0.1.1",
-    "@red-cup-engineering/semantic-content-identify-service": "0.2.2"
+    "@red-cup-engineering/ni-uri-services-section": "0.1.1"
   }
 }

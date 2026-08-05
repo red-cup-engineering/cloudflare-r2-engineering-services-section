@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { createR2SigV4Client, r2Configuration } from "./r2-sigv4.mjs";
-import { isCanonicalSha256NiUri, sha256DigestFromNiUri, verifySha256NiUri } from "@red-cup-engineering/semantic-content-identify-service";
+import { isNiUri, niUriDigest, verifyNiUri } from "@red-cup-engineering/ni-uri-services-section";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const PROFILE = "org.red-cup-engineering.immutable-content-reference.v1";
@@ -12,13 +12,13 @@ function exactBytes(value) {
   return bytes;
 }
 function identity(ni) {
-  if (!isCanonicalSha256NiUri(ni)) throw new TypeError("content identity must be one canonical SHA-256 ni URI");
-  return sha256DigestFromNiUri(ni);
+  if (!isNiUri(ni)) throw new TypeError("content identity must be one canonical SHA-256 ni URI");
+  return niUriDigest(ni);
 }
 function keyFor(ni) { const suffix = identity(ni); return `immutable/sha-256/${suffix.slice(0, 2)}/${suffix}`; }
 function verify(ni, bytes) {
   identity(ni);
-  if (!verifySha256NiUri(bytes, ni)) throw new Error("content bytes do not match their declared ni identity");
+  if (!verifyNiUri(bytes, ni)) throw new Error("content bytes do not match their declared ni identity");
 }
 
 export function createImmutableContentCustody({ r2 = createR2SigV4Client(r2Configuration()) } = {}) {
