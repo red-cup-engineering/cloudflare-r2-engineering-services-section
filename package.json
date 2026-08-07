@@ -1,0 +1,25 @@
+{
+  "name": "@red-cup-engineering/cloudflare-r2-services-section",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
+  "exports": {
+    "./r2-sigv4": "./src/r2-sigv4.mjs",
+    "./r2-rest": "./src/r2-rest.mjs",
+    "./immutable-content-custody": "./src/immutable-content-custody.mjs",
+    "./object-custody": "./src/r2-object-custody.js",
+    "./free-tier-admission": "./src/assay-cloudflare-r2-free-allowance.js"
+  },
+  "scripts": {
+    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check test/assay-cloudflare-r2-free-allowance.test.js && node --check test/r2-object-custody.test.js && node --check test/immutable-content-custody.test.mjs",
+    "test": "node --test test/assay-cloudflare-r2-free-allowance.test.js test/r2-object-custody.test.js test/immutable-content-custody.test.mjs",
+    "verify": "npm run check && npm test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@red-cup-engineering/ni-uri-services-section": "0.1.1"
+  }
+}
