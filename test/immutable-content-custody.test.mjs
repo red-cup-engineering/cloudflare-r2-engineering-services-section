@@ -1,8 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { createImmutableContentCustody, IMMUTABLE_CONTENT_REFERENCE_PROFILE } from "../src/immutable-content-custody.mjs";
-import { makeNiUri } from "@red-cup-engineering/ni-uri-services-section";
+import {
+  createCloudflareR2ImmutableContentCustody,
+  IMMUTABLE_CONTENT_REFERENCE_PROFILE,
+} from "../src/immutable-content-custody.mjs";
+import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 
 const niFor = (bytes) => makeNiUri(bytes);
 
@@ -26,7 +29,7 @@ function fakeR2() {
 test("put then get round-trips exact bytes under the derived key", async () => {
   const bytes = Buffer.from("semiotic foam");
   const ni = niFor(bytes);
-  const custody = createImmutableContentCustody({ r2: fakeR2() });
+  const custody = createCloudflareR2ImmutableContentCustody({ r2: fakeR2() });
   const stored = await custody.put({ ni, bytes, mediaType: "text/plain" });
   assert.equal(stored.profile, IMMUTABLE_CONTENT_REFERENCE_PROFILE);
   assert.equal(stored.ni, ni);
@@ -37,13 +40,13 @@ test("put then get round-trips exact bytes under the derived key", async () => {
 });
 
 test("put refuses bytes that do not match the declared ni identity", async () => {
-  const custody = createImmutableContentCustody({ r2: fakeR2() });
+  const custody = createCloudflareR2ImmutableContentCustody({ r2: fakeR2() });
   const wrongNi = niFor(Buffer.from("other content"));
   await assert.rejects(() => custody.put({ ni: wrongNi, bytes: Buffer.from("semiotic foam") }));
 });
 
 test("put refuses a noncanonical final sextet for the same digest", async () => {
-  const custody = createImmutableContentCustody({ r2: fakeR2() });
+  const custody = createCloudflareR2ImmutableContentCustody({ r2: fakeR2() });
   const bytes = Buffer.from("semiotic foam");
   const canonical = niFor(bytes);
   const noncanonical = `${canonical.slice(0, -1)}B`;
@@ -54,7 +57,15 @@ test("put refuses a noncanonical final sextet for the same digest", async () => 
 });
 
 test("get returns null for content never stored", async () => {
-  const custody = createImmutableContentCustody({ r2: fakeR2() });
+  const custody = createCloudflareR2ImmutableContentCustody({ r2: fakeR2() });
   const ni = niFor(Buffer.from("never stored"));
   assert.equal(await custody.get(ni), null);
+});
+
+test("adapter passes an explicit content-class maximum to generic custody", async () => {
+  const bytes = Buffer.alloc(9 * 1024 * 1024, 3);
+  const ni = niFor(bytes);
+  await assert.rejects(() => createCloudflareR2ImmutableContentCustody({ r2: fakeR2() }).put({ ni, bytes }), /through 8388608 bytes/u);
+  const custody = createCloudflareR2ImmutableContentCustody({ r2: fakeR2(), maximumBytes: bytes.length });
+  assert.equal((await custody.put({ ni, bytes })).byteLength, bytes.length);
 });

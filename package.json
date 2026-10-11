@@ -1,25 +1,38 @@
 {
   "name": "@red-cup-engineering/cloudflare-r2-services-section",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.5.0",
   "type": "module",
   "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
   "exports": {
     "./r2-sigv4": "./src/r2-sigv4.mjs",
     "./r2-rest": "./src/r2-rest.mjs",
+    "./category-reference-index": "./src/category-reference-index.mjs",
+    "./add-category-reference": "./scripts/add-category-reference.mjs",
+    "./query-category-reference": "./scripts/query-category-reference.mjs",
     "./immutable-content-custody": "./src/immutable-content-custody.mjs",
     "./object-custody": "./src/r2-object-custody.js",
-    "./free-tier-admission": "./src/assay-cloudflare-r2-free-allowance.js"
+    "./free-tier-admission": "./src/assay-cloudflare-r2-free-allowance.js",
+    "./git-lfs-transfer-agent": "./scripts/git-lfs-r2-transfer-agent.mjs"
   },
+  "files": [
+    "src",
+    "scripts",
+    "lib"
+  ],
   "scripts": {
-    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check test/assay-cloudflare-r2-free-allowance.test.js && node --check test/r2-object-custody.test.js && node --check test/immutable-content-custody.test.mjs",
-    "test": "node --test test/assay-cloudflare-r2-free-allowance.test.js test/r2-object-custody.test.js test/immutable-content-custody.test.mjs",
-    "verify": "npm run check && npm test"
+    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/category-reference-index.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check scripts/git-lfs-r2-transfer-agent.mjs && node --check test/assay-cloudflare-r2-free-allowance.test.js && node --check test/r2-object-custody.test.js && node --check test/immutable-content-custody.test.mjs && node --check test/git-lfs-r2-transfer-agent.test.mjs",
+    "test": "node --test test/assay-cloudflare-r2-free-allowance.test.js test/r2-object-custody.test.js test/immutable-content-custody.test.mjs test/git-lfs-r2-transfer-agent.test.mjs"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
-    "@red-cup-engineering/ni-uri-services-section": "0.1.1"
+    "@red-cup-engineering/category-reference-index-service": "workspace:*",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/execute-javascript-node-command-service": "workspace:*",
+    "@red-cup-engineering/computer-file-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/git-services-section": "workspace:*",
+    "@red-cup-engineering/immutable-content-custody-service": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
   }
 }
