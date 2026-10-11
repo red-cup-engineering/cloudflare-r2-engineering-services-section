@@ -1,10 +1,11 @@
-import { createHmac, createHash } from "node:crypto";
+import { createHmac } from "node:crypto";
+import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 const SERVICE = "s3";
 const REGION = "auto";
-const EMPTY_SHA256 = createHash("sha256").update("").digest("hex");
+const EMPTY_SHA256 = sha256Hex("");
 
-function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
+function sha256(value) { return sha256Hex(value); }
 function hmac(key, value) { return createHmac("sha256", key).update(value).digest(); }
 function awsEncode(value) {
   return encodeURIComponent(value).replace(/[!'()*]/gu, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`);
