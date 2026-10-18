@@ -3,6 +3,11 @@
   "version": "0.5.2",
   "type": "module",
   "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/computer-web-engineering-services-section.git",
+    "directory": "services/web-platform-services-section/services/cloud-services-section/services/cloudflare-services-section/services/cloudflare-r2-services-section"
+  },
   "exports": {
     "./r2-sigv4": "./src/r2-sigv4.mjs",
     "./r2-rest": "./src/r2-rest.mjs",
