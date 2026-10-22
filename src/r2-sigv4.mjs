@@ -19,6 +19,7 @@ function signingKey(secret, day) {
 }
 function normalizedHeaders(values) {
   return Object.fromEntries(Object.entries(values)
+    .filter(([, value]) => value !== undefined && value !== null)
     .map(([name, value]) => [name.toLowerCase(), String(value).trim().replace(/\s+/gu, " ")])
     .sort(([left], [right]) => left.localeCompare(right)));
 }
@@ -84,7 +85,8 @@ export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = 
     }
     return Object.freeze({
       conflict: false,
-      etag: result.headers.get("etag")?.replace(/^"|"$/gu, "") ?? null,
+      // R2 compresses some bodies on the fly and then names them with a weak etag; the value is the stored one.
+      etag: result.headers.get("etag")?.replace(/^W\//u, "").replace(/^"|"$/gu, "") ?? null,
       byteLength: Number(result.headers.get("content-length")),
       mediaType: result.headers.get("content-type"),
       metadata: Object.freeze({
@@ -114,7 +116,7 @@ export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = 
         "x-amz-storage-class": "STANDARD",
       },
     }),
-    get: (key) => request("GET", key),
+    get: (key) => request("GET", key, { headers: { "accept-encoding": "identity" } }),
     deleteCurrent: (key, etag) => request("DELETE", key, { headers: etag === undefined ? {} : { "if-match": `\"${etag}\"` } }),
     putCurrent: (key, { body, byteLength, mediaType, sha256: digest, taskId, tenant, contentSha256, etag }) => request("PUT", key, {
       body,
@@ -122,7 +124,7 @@ export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = 
       headers: {
         "content-length": byteLength,
         "content-type": mediaType,
-        ...(etag === null ? { "if-none-match": "*" } : { "if-match": `\"${etag}\"` }),
+        ...(etag == null ? { "if-none-match": "*" } : { "if-match": `\"${etag}\"` }),
         "x-amz-meta-byte-length": byteLength,
         "x-amz-meta-sha256": digest,
         "x-amz-meta-task-id": taskId,
