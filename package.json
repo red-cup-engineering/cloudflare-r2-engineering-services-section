@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/cloudflare-r2-services-section",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "type": "module",
   "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
   "repository": {
@@ -17,7 +17,9 @@
     "./object-custody": "./src/r2-object-custody.js",
     "./free-tier-admission": "./src/assay-cloudflare-r2-free-allowance.js",
     "./git-lfs-transfer-agent": "./scripts/git-lfs-r2-transfer-agent.mjs",
-    "./directory-custody": "./src/r2-directory-custody.mjs"
+    "./directory-custody": "./src/r2-directory-custody.mjs",
+    "./lease": "./src/r2-lease.mjs",
+    "./custody-run": "./src/r2-custody-run.mjs"
   },
   "files": [
     "src",
@@ -25,8 +27,8 @@
     "lib"
   ],
   "scripts": {
-    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/category-reference-index.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check scripts/git-lfs-r2-transfer-agent.mjs && node --check test/assay-cloudflare-r2-free-allowance.test.js && node --check test/r2-object-custody.test.js && node --check test/immutable-content-custody.test.mjs && node --check test/git-lfs-r2-transfer-agent.test.mjs && node --check src/r2-directory-custody.mjs && node --check scripts/r2-directory-custody.mjs && node --check test/r2-directory-custody.test.mjs",
-    "test": "node --test test/assay-cloudflare-r2-free-allowance.test.js test/r2-object-custody.test.js test/immutable-content-custody.test.mjs test/git-lfs-r2-transfer-agent.test.mjs test/r2-directory-custody.test.mjs"
+    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/category-reference-index.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check scripts/git-lfs-r2-transfer-agent.mjs && node --check test/assay-cloudflare-r2-free-allowance.test.js && node --check test/r2-object-custody.test.js && node --check test/immutable-content-custody.test.mjs && node --check test/git-lfs-r2-transfer-agent.test.mjs && node --check src/r2-directory-custody.mjs && node --check scripts/r2-directory-custody.mjs && node --check test/r2-directory-custody.test.mjs && node --check src/r2-lease.mjs && node --check src/r2-custody-run.mjs && node --check scripts/r2-custody-run.mjs && node --check test/r2-custody-run.test.mjs",
+    "test": "node --test test/assay-cloudflare-r2-free-allowance.test.js test/r2-object-custody.test.js test/immutable-content-custody.test.mjs test/git-lfs-r2-transfer-agent.test.mjs test/r2-directory-custody.test.mjs test/r2-custody-run.test.mjs"
   },
   "engines": {
     "node": ">=22"
@@ -47,6 +49,7 @@
     "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
   },
   "bin": {
-    "r2-directory-custody": "scripts/r2-directory-custody.mjs"
+    "r2-directory-custody": "scripts/r2-directory-custody.mjs",
+    "r2-custody-run": "scripts/r2-custody-run.mjs"
   }
 }
