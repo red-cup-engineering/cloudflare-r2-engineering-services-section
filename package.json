@@ -39,5 +39,10 @@
     "@red-cup-engineering/git-services-section": "0.1.2",
     "@red-cup-engineering/immutable-content-custody-service": "0.4.1"
   },
-  "private": false
+  "private": false,
+  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
+  }
 }
