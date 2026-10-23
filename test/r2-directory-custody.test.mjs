@@ -81,3 +81,17 @@ test("an R2 weak etag (a body compressed in transit) still names the stored obje
   assert.equal((await r2.get("registers/x.json")).etag, "abc");
   assert.equal(seen[0]["accept-encoding"], "identity");
 });
+
+test("the R2 client tries a dropped connection or a transient refusal again, but not a final refusal", async () => {
+  const { createR2SigV4Client } = await import("../src/r2-sigv4.mjs");
+  const answers = [() => { throw new TypeError("fetch failed"); }, () => new Response("busy", { status: 503 }), () => new Response("ok", { status: 200, headers: { etag: '"e1"' } })];
+  let calls = 0;
+  const config = { accountId: "0".repeat(32), bucket: "b-b", accessKeyId: "k", secretAccessKey: "s" };
+  const r2 = createR2SigV4Client(config, { fetchImpl: async () => answers[calls++](), wait: async () => {} });
+  assert.equal((await r2.get("x")).etag, "e1");
+  assert.equal(calls, 3);
+  let denied = 0;
+  const strict = createR2SigV4Client(config, { fetchImpl: async () => { denied += 1; return new Response("no", { status: 403 }); }, wait: async () => {} });
+  await assert.rejects(strict.get("x"), /refused \(403\)/);
+  assert.equal(denied, 1);
+});

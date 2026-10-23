@@ -51,7 +51,16 @@ export function r2Configuration(environment = process.env) {
   return Object.freeze({ accountId, bucket, accessKeyId, secretAccessKey });
 }
 
-export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = () => new Date() } = {}) {
+// A request that failed before R2 answered, or that R2 answered 429 or 5xx, is tried again: one dropped
+// connection among the tens of thousands a directory restore makes must not end the turn. Each attempt is
+// signed afresh. A streamed body cannot be replayed, so a request carrying one is tried once.
+const replayable = (body) => body === undefined || typeof body === "string" || body instanceof Uint8Array || body instanceof ArrayBuffer;
+const transient = (status) => status === 429 || status >= 500;
+
+export function createR2SigV4Client(configuration, {
+  fetchImpl = fetch, clock = () => new Date(), attempts = 6,
+  retryMs = (attempt) => Math.min(30_000, 500 * 2 ** attempt), wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+} = {}) {
   const config = Object.freeze({
     accountId: required(configuration?.accountId, "accountId"),
     bucket: required(configuration?.bucket, "bucket"),
@@ -61,7 +70,17 @@ export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = 
   });
   const origin = `https://${config.accountId}.r2.cloudflarestorage.com`;
 
-  async function request(method, key, { body, headers = {}, payloadHash = EMPTY_SHA256, query = "" } = {}) {
+  async function request(method, key, options = {}) {
+    const tries = replayable(options.body) ? attempts : 1;
+    for (let attempt = 1; ; attempt += 1) {
+      let result;
+      try { result = await attemptRequest(method, key, options); }
+      catch (error) { if (attempt >= tries || error.r2Status !== undefined) throw error; await wait(retryMs(attempt)); continue; }
+      return result;
+    }
+  }
+
+  async function attemptRequest(method, key, { body, headers = {}, payloadHash = EMPTY_SHA256, query = "" } = {}) {
     const path = canonicalPath(config.bucket, key);
     const now = clock();
     const signed = normalizedHeaders({
@@ -81,7 +100,10 @@ export function createR2SigV4Client(configuration, { fetchImpl = fetch, clock = 
     if (result.status === 412 && method === "PUT") return Object.freeze({ conflict: true });
     if (!result.ok) {
       const detail = method === "HEAD" ? "" : (await result.text()).slice(0, 512);
-      throw new Error(`R2 ${method} refused (${result.status})${detail === "" ? "" : `: ${detail}`}`);
+      const refusal = new Error(`R2 ${method} refused (${result.status})${detail === "" ? "" : `: ${detail}`}`);
+      // Only a transient refusal is tried again; anything else (403, 400) is final.
+      if (!transient(result.status)) refusal.r2Status = result.status;
+      throw refusal;
     }
     return Object.freeze({
       conflict: false,
