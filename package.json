@@ -1,11 +1,11 @@
 {
-  "name": "@red-cup-engineering/cloudflare-r2-services-section",
+  "name": "@red-cup-engineering/cloudflare-r2-engineering-services-section",
   "version": "0.7.1",
   "type": "module",
   "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/red-cup-engineering/cloudflare-r2-services-section.git"
+    "url": "git+https://github.com/red-cup-engineering/cloudflare-r2-engineering-services-section.git"
   },
   "exports": {
     "./r2-sigv4": "./src/r2-sigv4.mjs",
