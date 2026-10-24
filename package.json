@@ -1,5 +1,5 @@
 {
-  "name": "@red-cup-engineering/cloudflare-r2-engineering-services-section",
+  "name": "@red-cup-engineering/cloudflare-r2-services-section",
   "version": "0.7.1",
   "type": "module",
   "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
@@ -36,10 +36,10 @@
   "dependencies": {
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
     "@red-cup-engineering/computer-file-engineering-services-section": "0.4.0",
-    "@red-cup-engineering/uri-engineering-services-section": "0.1.1",
+    "@red-cup-engineering/uri-services-section": "0.1.1",
     "@red-cup-engineering/category-reference-index-service": "0.4.2",
     "@red-cup-engineering/execute-javascript-node-command-service": "0.3.1",
-    "@red-cup-engineering/git-engineering-services-section": "0.1.2",
+    "@red-cup-engineering/git-services-section": "0.1.2",
     "@red-cup-engineering/immutable-content-custody-service": "0.4.1"
   },
   "private": false,
