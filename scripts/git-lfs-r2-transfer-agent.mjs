@@ -26,7 +26,7 @@
 import { readFileText } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 import { executeJavascriptNodeCommand } from "@red-cup-engineering/execute-javascript-node-command-service";
 import { executeJavascriptNodeCommandWithInheritedStdio } from "@red-cup-engineering/execute-javascript-node-command-service/with-inherited-stdio";
-import { gitCommitPathsPlan } from "@red-cup-engineering/git-services-section/git-command-codec";
+import { gitCommitPathsPlan } from "@red-cup-engineering/git-source-reading-service/git-command-codec";
 import { isAbsolute as isAbsoluteFilepath, resolve } from "node:path";
 import { statPath } from "@red-cup-engineering/computer-file-engineering-services-section/stat-path";
 
