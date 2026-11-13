@@ -50,7 +50,7 @@
           "additionalProperties": false,
           "required": ["provider", "contract", "storageClass", "customer"],
           "properties": {
-            "provider": { "const": "urn:ame:cloudflare-r2-services-section" },
+            "provider": { "const": "urn:ame:cloudflare-r2-engineering-services-section" },
             "contract": { "const": "cloudflare-r2-object-custody/v1" },
             "storageClass": { "const": "Standard" },
             "customer": { "$ref": "#/$defs/caip10" }

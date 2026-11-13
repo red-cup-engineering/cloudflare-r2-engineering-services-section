@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { isAbsolute, normalize, sep } from "node:path";
 
 export const CONTRACT = "cloudflare-r2-object-custody/v1";
-export const PROVIDER = "urn:ame:cloudflare-r2-services-section";
+export const PROVIDER = "urn:ame:cloudflare-r2-engineering-services-section";
 export const MINIMUM_BULK_BYTES = 1024 * 1024;
 export const MAXIMUM_SINGLE_UPLOAD_BYTES = (5 * 1024 * 1024 * 1024) - (5 * 1024 * 1024);
 const SHA256 = /^[a-f0-9]{64}$/u;
