@@ -5,7 +5,7 @@ import {
   createCloudflareR2ImmutableContentCustody,
   IMMUTABLE_CONTENT_REFERENCE_PROFILE,
 } from "../src/immutable-content-custody.mjs";
-import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
+import { makeNiUri } from "@red-cup-engineering/uri-engineering-services-section/ni-uri";
 
 const niFor = (bytes) => makeNiUri(bytes);
 

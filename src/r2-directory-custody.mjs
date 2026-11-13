@@ -11,7 +11,7 @@
 import { createHash } from "node:crypto";
 import { chmodSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import { makeNiUri, verifyNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
+import { makeNiUri, verifyNiUri } from "@red-cup-engineering/uri-engineering-services-section/ni-uri";
 import { immutableContentKey } from "@red-cup-engineering/immutable-content-custody-service";
 
 export const MANIFEST_KIND = "r2-directory-custody.manifest/v1";
