@@ -1,3 +1,4 @@
+import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
 // A working directory kept in R2 by content, so the process that works in it can run on any machine.
 //
 // Every file is an immutable object named by its ni (the same keys immutable-content-custody uses); a
@@ -24,7 +25,7 @@ export const registerKey = (name) => {
   return `registers/directories/${name}.json`;
 };
 
-const sha256Hex = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
 const posix = (path) => path.split(sep).join("/");
 
 /** Whether a root-relative path is left out: an exact path or anything beneath one. */

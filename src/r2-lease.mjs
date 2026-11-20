@@ -1,3 +1,4 @@
+import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
 // Who carries an application right now, decided in R2 rather than by which machine it was installed on.
 //
 // A lease is a register in R2 naming a holder and a time it lapses; it moves only by compare-and-swap on
@@ -14,7 +15,7 @@ export const leaseKey = (name) => {
   return `registers/leases/${name}.json`;
 };
 
-const sha256Hex = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
 
 /**
  * @param {{r2: {get: Function, putCurrent: Function}, clock?: () => number}} options
