@@ -48,34 +48,34 @@ function proposedFieldsValid(proposed) {
     && integerNonnegative(proposed?.classBOperations);
 }
 
-export function assayCloudflareR2FreeAllowance(request, { now = new Date().toISOString() } = {}) {
-  const refusals = [];
+export function checkCloudflareR2FreeAllowance(request, { now = new Date().toISOString() } = {}) {
+  const rejections = [];
   const usage = request?.accountWideBillableUsage;
   const proposed = request?.proposedMaximumUsage;
   const nowMilliseconds = Date.parse(now);
   const observedMilliseconds = Date.parse(usage?.observedAt ?? "");
 
-  if (request?.type !== "CloudflareR2FreeAllowanceAdmissionRequest") refusals.push("typed-request-required");
-  if (request?.storageClass !== "Standard") refusals.push("standard-storage-only");
-  if (usage?.type !== "CloudflareR2AccountWideBillableUsageSnapshot") refusals.push("typed-billable-usage-snapshot-required");
-  if (usage?.source !== BILLABLE_USAGE_SOURCE) refusals.push("account-wide-billable-usage-source-required");
-  if (usage?.complete !== true) refusals.push("complete-billable-usage-period-required");
+  if (request?.type !== "CloudflareR2FreeAllowanceAdmissionRequest") rejections.push("typed-request-required");
+  if (request?.storageClass !== "Standard") rejections.push("standard-storage-only");
+  if (usage?.type !== "CloudflareR2AccountWideBillableUsageSnapshot") rejections.push("typed-billable-usage-snapshot-required");
+  if (usage?.source !== BILLABLE_USAGE_SOURCE) rejections.push("account-wide-billable-usage-source-required");
+  if (usage?.complete !== true) rejections.push("complete-billable-usage-period-required");
   if (!Number.isFinite(nowMilliseconds)
     || !Number.isFinite(observedMilliseconds)
     || observedMilliseconds > nowMilliseconds
     || nowMilliseconds - observedMilliseconds > MAX_USAGE_AGE_MS) {
-    refusals.push("fresh-billable-usage-snapshot-required");
+    rejections.push("fresh-billable-usage-snapshot-required");
   }
-  if (usage?.billingPeriod !== utcMonth(now)) refusals.push("current-utc-billing-period-required");
-  if (!usageFieldsValid(usage)) refusals.push("valid-account-wide-usage-required");
-  if (!proposedFieldsValid(proposed)) refusals.push("valid-proposed-maximum-usage-required");
+  if (usage?.billingPeriod !== utcMonth(now)) rejections.push("current-utc-billing-period-required");
+  if (!usageFieldsValid(usage)) rejections.push("valid-account-wide-usage-required");
+  if (!proposedFieldsValid(proposed)) rejections.push("valid-proposed-maximum-usage-required");
 
   if (usageFieldsValid(usage)) {
     if (usage.infrequentAccessStorageGbMonth !== 0
       || usage.infrequentAccessClassAOperations !== 0
       || usage.infrequentAccessClassBOperations !== 0
       || usage.infrequentAccessRetrievalGb !== 0) {
-      refusals.push("infrequent-access-billable-exposure-present");
+      rejections.push("infrequent-access-billable-exposure-present");
     }
   }
 
@@ -88,16 +88,16 @@ export function assayCloudflareR2FreeAllowance(request, { now = new Date().toISO
     : null;
 
   if (resulting) {
-    if (resulting.standardStorageGbMonth > MEDIATED_MONTHLY_CEILING.standardStorageGbMonth) refusals.push("standard-storage-headroom-exhausted");
-    if (resulting.classAOperations > MEDIATED_MONTHLY_CEILING.classAOperations) refusals.push("class-a-headroom-exhausted");
-    if (resulting.classBOperations > MEDIATED_MONTHLY_CEILING.classBOperations) refusals.push("class-b-headroom-exhausted");
+    if (resulting.standardStorageGbMonth > MEDIATED_MONTHLY_CEILING.standardStorageGbMonth) rejections.push("standard-storage-headroom-exhausted");
+    if (resulting.classAOperations > MEDIATED_MONTHLY_CEILING.classAOperations) rejections.push("class-a-headroom-exhausted");
+    if (resulting.classBOperations > MEDIATED_MONTHLY_CEILING.classBOperations) rejections.push("class-b-headroom-exhausted");
   }
 
   return Object.freeze({
     type: "CloudflareR2FreeAllowanceAdmissionDecision",
-    admitted: refusals.length === 0,
-    disposition: refusals.length === 0 ? "admitted-within-reserved-free-allowance" : "refused-fail-closed",
-    refusals: Object.freeze([...new Set(refusals)]),
+    admitted: rejections.length === 0,
+    disposition: rejections.length === 0 ? "admitted-within-reserved-free-allowance" : "refused-fail-closed",
+    refusals: Object.freeze([...new Set(rejections)]),
     publishedMonthlyFreeAllowance: PUBLISHED_MONTHLY_FREE_ALLOWANCE,
     mediatedMonthlyCeiling: MEDIATED_MONTHLY_CEILING,
     resultingUsage: resulting,
@@ -113,7 +113,7 @@ function run() {
     process.exitCode = 2;
     return;
   }
-  const decision = assayCloudflareR2FreeAllowance(request);
+  const decision = checkCloudflareR2FreeAllowance(request);
   process.stdout.write(`${JSON.stringify(decision, null, 2)}\n`);
   process.exitCode = decision.admitted ? 0 : 2;
 }

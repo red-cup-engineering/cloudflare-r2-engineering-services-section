@@ -100,10 +100,10 @@ export function createR2SigV4Client(configuration, {
     if (result.status === 412 && method === "PUT") return Object.freeze({ conflict: true });
     if (!result.ok) {
       const detail = method === "HEAD" ? "" : (await result.text()).slice(0, 512);
-      const refusal = new Error(`R2 ${method} refused (${result.status})${detail === "" ? "" : `: ${detail}`}`);
+      const rejection = new Error(`R2 ${method} refused (${result.status})${detail === "" ? "" : `: ${detail}`}`);
       // Only a transient refusal is tried again; anything else (403, 400) is final.
-      if (!transient(result.status)) refusal.r2Status = result.status;
-      throw refusal;
+      if (!transient(result.status)) rejection.r2Status = result.status;
+      throw rejection;
     }
     return Object.freeze({
       conflict: false,

@@ -87,7 +87,7 @@ function cacheRead(cache, ni) {
 /**
  * @param {{r2: {get: Function, head: Function, put: Function, putCurrent: Function}, cache?: string, width?: number, log?: (event: object) => void}} options
  */
-export function createR2DirectoryCustody({ r2, cache, width = 32, log = () => {} }) {
+export function createR2DirectoryStorage({ r2, cache, width = 32, log = () => {} }) {
   async function putBlob(ni, bytes, mediaType = "application/octet-stream") {
     const result = await r2.put(immutableContentKey(ni), { body: bytes, byteLength: bytes.length, mediaType, sha256: sha256Hex(bytes) });
     cacheWrite(cache, ni, bytes);

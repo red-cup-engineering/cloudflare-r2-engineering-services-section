@@ -5,7 +5,7 @@ import {
 
 import { createR2SigV4Client, r2Configuration } from "./r2-sigv4.mjs";
 
-export function createCloudflareR2ImmutableContentCustody({
+export function createCloudflareR2ImmutableContentStorage({
   environment = process.env,
   r2 = createR2SigV4Client(r2Configuration(environment)),
   maximumBytes,
