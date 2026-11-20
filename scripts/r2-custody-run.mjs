@@ -10,7 +10,7 @@ import { hostname } from "node:os";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { createR2SigV4Client, r2Configuration } from "../src/r2-sigv4.mjs";
-import { runInStorage } from "../src/r2-custody-run.mjs";
+import { runInCustody } from "../src/r2-custody-run.mjs";
 
 const split = process.argv.indexOf("--");
 const { values } = parseArgs({
@@ -32,7 +32,7 @@ const binding = (text) => {
   const [name, manifest] = head.split("@");
   return { name, path, ...(manifest ? { manifest } : {}) };
 };
-const report = await runInStorage({
+const report = await runInCustody({
   r2: createR2SigV4Client(r2Configuration()),
   lease: values.lease,
   holder: values.holder ?? `${hostname()}:${process.pid}`,

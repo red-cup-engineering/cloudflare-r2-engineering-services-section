@@ -36,26 +36,26 @@ export function isLegacyAssetPath(sourcePath) {
 }
 
 export function validateStoreRequest(request, { now = new Date().toISOString(), providerCaip10 = process.env.CLOUDFLARE_R2_PROVIDER_CAIP10 } = {}) {
-  const rejections = [];
+  const refusals = [];
   const grant = request?.sourceGrant;
-  if (request?.type !== "CloudflareR2ObjectCustodyRequest" || request?.operation !== "store") rejections.push("typed-store-request-required");
-  if (typeof request?.customer !== "string" || !/^urn:ame:[a-z0-9][a-z0-9.-]*$/u.test(request.customer)) rejections.push("customer-actor-required");
-  if (!CAIP10.test(request?.caller ?? "")) rejections.push("caller-caip10-required");
-  if (!CAIP10.test(providerCaip10 ?? "")) rejections.push("provider-caip10-required");
-  if (grant?.type !== "ExactFilesystemReadGrant") rejections.push("exact-filesystem-read-grant-required");
-  if (!isAbsolute(grant?.sourcePath ?? "")) rejections.push("absolute-source-path-required");
-  if (isLegacyAssetPath(grant?.sourcePath)) rejections.push("legacy-assets-are-outside-custody-authority");
-  if (grant?.legacyAssetsExcluded !== true) rejections.push("explicit-legacy-assets-exclusion-required");
-  if (JSON.stringify(grant?.effects) !== JSON.stringify(["lstat", "read"])) rejections.push("read-only-effects-required");
-  if (!SHA256.test(grant?.sha256 ?? "")) rejections.push("lowercase-sha256-required");
-  if (!Number.isSafeInteger(grant?.byteLength) || grant.byteLength < MINIMUM_BULK_BYTES || grant.byteLength > MAXIMUM_SINGLE_UPLOAD_BYTES) rejections.push("bounded-bulk-byte-length-required");
-  if (typeof request?.mediaType !== "string" || !/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/iu.test(request.mediaType)) rejections.push("media-type-required");
+  if (request?.type !== "CloudflareR2ObjectCustodyRequest" || request?.operation !== "store") refusals.push("typed-store-request-required");
+  if (typeof request?.customer !== "string" || !/^urn:ame:[a-z0-9][a-z0-9.-]*$/u.test(request.customer)) refusals.push("customer-actor-required");
+  if (!CAIP10.test(request?.caller ?? "")) refusals.push("caller-caip10-required");
+  if (!CAIP10.test(providerCaip10 ?? "")) refusals.push("provider-caip10-required");
+  if (grant?.type !== "ExactFilesystemReadGrant") refusals.push("exact-filesystem-read-grant-required");
+  if (!isAbsolute(grant?.sourcePath ?? "")) refusals.push("absolute-source-path-required");
+  if (isLegacyAssetPath(grant?.sourcePath)) refusals.push("legacy-assets-are-outside-custody-authority");
+  if (grant?.legacyAssetsExcluded !== true) refusals.push("explicit-legacy-assets-exclusion-required");
+  if (JSON.stringify(grant?.effects) !== JSON.stringify(["lstat", "read"])) refusals.push("read-only-effects-required");
+  if (!SHA256.test(grant?.sha256 ?? "")) refusals.push("lowercase-sha256-required");
+  if (!Number.isSafeInteger(grant?.byteLength) || grant.byteLength < MINIMUM_BULK_BYTES || grant.byteLength > MAXIMUM_SINGLE_UPLOAD_BYTES) refusals.push("bounded-bulk-byte-length-required");
+  if (typeof request?.mediaType !== "string" || !/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/iu.test(request.mediaType)) refusals.push("media-type-required");
   const expires = Date.parse(request?.expiresAt ?? "");
   const current = Date.parse(now);
-  if (!Number.isFinite(expires) || !Number.isFinite(current) || expires <= current || expires - current > 3_600_000) rejections.push("request-expiry-within-one-hour-required");
-  if (grant?.expiresAt !== request?.expiresAt) rejections.push("grant-expiry-must-match-request");
-  if (request?.parentEffect !== null && !/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/u.test(request?.parentEffect ?? "")) rejections.push("parent-effect-must-be-ni-or-null");
-  return Object.freeze([...new Set(rejections)]);
+  if (!Number.isFinite(expires) || !Number.isFinite(current) || expires <= current || expires - current > 3_600_000) refusals.push("request-expiry-within-one-hour-required");
+  if (grant?.expiresAt !== request?.expiresAt) refusals.push("grant-expiry-must-match-request");
+  if (request?.parentEffect !== null && !/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/u.test(request?.parentEffect ?? "")) refusals.push("parent-effect-must-be-ni-or-null");
+  return Object.freeze([...new Set(refusals)]);
 }
 
 async function digestDescriptor(descriptor) {
@@ -71,7 +71,7 @@ function remoteMatches(remote, expected) {
     && remote.mediaType === expected.mediaType
     && (remote.byteLength === 0 || Number.isNaN(remote.byteLength) || remote.byteLength === expected.byteLength);
 }
-function knowledge(expected, remote, decision) {
+function knowledge(expected, remote, disposition) {
   return Object.freeze({
     type: "BucketObjectKnowledge",
     id: expected.id,
@@ -81,14 +81,14 @@ function knowledge(expected, remote, decision) {
     mediaType: expected.mediaType,
     custody: Object.freeze({ provider: PROVIDER, contract: CONTRACT, storageClass: "Standard", customer: expected.customer }),
     etag: remote.etag,
-    disposition: decision,
+    disposition,
     carriesBytes: false,
   });
 }
 
 export async function storeGrantedObject(request, { client, providerCaip10 = process.env.CLOUDFLARE_R2_PROVIDER_CAIP10, now = new Date().toISOString() } = {}) {
-  const rejections = validateStoreRequest(request, { providerCaip10, now });
-  if (rejections.length !== 0) throw new Error(`custody request refused: ${rejections.join(",")}`);
+  const refusals = validateStoreRequest(request, { providerCaip10, now });
+  if (refusals.length !== 0) throw new Error(`custody request refused: ${refusals.join(",")}`);
   if (!client || typeof client.head !== "function" || typeof client.put !== "function") throw new Error("one R2 custody client is required");
   const grant = request.sourceGrant;
   const uuid = uuidFromSha256(grant.sha256);

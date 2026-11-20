@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { createR2SigV4Client, r2Configuration } from "../src/r2-sigv4.mjs";
-import { createR2DirectoryStorage } from "../src/r2-directory-custody.mjs";
+import { createR2DirectoryCustody } from "../src/r2-directory-custody.mjs";
 
 const { positionals: [verb, name, root], values } = parseArgs({
   allowPositionals: true,
@@ -17,11 +17,11 @@ if (!["retain", "restore"].includes(verb) || !name || !root) {
   process.stderr.write("usage: r2-directory-custody (retain|restore) <name> <root> [options]\n");
   process.exit(2);
 }
-const storage = createR2DirectoryStorage({ r2: createR2SigV4Client(r2Configuration()), cache: values.cache });
+const custody = createR2DirectoryCustody({ r2: createR2SigV4Client(r2Configuration()), cache: values.cache });
 const expectFile = values["expect-file"];
 const expect = values.expect ?? (expectFile ? JSON.parse(readFileSync(expectFile, "utf8")).manifest ?? undefined : undefined);
 const report = verb === "restore"
-  ? await storage.restore(name, root, { manifest: values.manifest })
-  : await storage.retain(name, root, { exclude: values.exclude, expect, note: values.note });
+  ? await custody.restore(name, root, { manifest: values.manifest })
+  : await custody.retain(name, root, { exclude: values.exclude, expect, note: values.note });
 process.stdout.write(`${JSON.stringify(report)}\n`);
 if (report.conflict) process.exit(3);
