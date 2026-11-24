@@ -38,7 +38,6 @@
     "@red-cup-engineering/uri-engineering-services-section": "^0.1.7",
     "@red-cup-engineering/category-reference-index-service": "^0.4.4",
     "@red-cup-engineering/execute-javascript-node-command-service": "^0.4.3",
-    "@red-cup-engineering/git-engineering-services-section": "^0.4.3",
     "@red-cup-engineering/immutable-content-custody-service": "^0.8.0",
     "@red-cup-engineering/git-engine": "^0.1.10-dev.0",
     "@red-cup-engineering/semiotic-content-address-system": "^0.1.7 || 0.1.8-dev.0"
