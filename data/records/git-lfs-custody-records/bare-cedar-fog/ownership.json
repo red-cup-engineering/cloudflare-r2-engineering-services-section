@@ -1,0 +1,12 @@
+{
+  "kind": "ownership-law-shadow",
+  "node": "bare-cedar-fog-r2-git-lfs",
+  "owners": ["561-group", "bare-cedar-fog"],
+  "rules": [
+    "the bucket bare-cedar-fog-git-lfs carries binary asset bytes; the monorepo carries their pointers and all text",
+    "credential bytes reside only in the repository .env and are read at invocation; no key material is written into git config, the transfer agent's arguments as recorded by git, or any record under data/",
+    "the S3 access key is scoped to this one bucket and cannot enumerate the account's buckets",
+    "git-lfs runs as a standalone transfer agent, so no LFS API server is contacted and GitHub never carries asset bytes or meters their transfer",
+    "objects are stored uncompressed so bucket contents remain verifiable independently of git-lfs"
+  ]
+}

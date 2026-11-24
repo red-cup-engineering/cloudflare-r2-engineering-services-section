@@ -20,3 +20,7 @@ This section contains the repository's Cloudflare R2 mechanics: S3-compatible
 SigV4 requests, content-addressed ownership, verified short-lived reads, and
 free-tier admission.  It does not own a customer, an ActivityStreams contract,
 or A2A validation; those are adapters supplied by their respective sections.
+
+## Git LFS object custody
+
+`scripts/git-lfs-r2-transfer-agent.mjs` is a git-lfs standalone transfer agent that keeps a repository's LFS objects in a Cloudflare R2 bucket, so large binaries (PDFs, books, recordings, video) stay out of the git object database and out of GitHub's LFS metering; R2 bills per gigabyte-month and charges no egress. Objects are stored uncompressed, so a bucket object's SHA-256 equals its git-lfs object id and can be verified with any S3 client without git-lfs (`rclone cat :s3:<bucket>/<oid> | sha256sum` equals `<oid>`). Credentials are read from the repository `.env` at invocation and passed to the transfer program through the environment, never as arguments and never into git config. Which file patterns become LFS objects is declared by the repository-root `.gitattributes`. Bare Cedar Fog's bucket, credential names and custody law are in `data/records/git-lfs-custody-records/bare-cedar-fog/`.

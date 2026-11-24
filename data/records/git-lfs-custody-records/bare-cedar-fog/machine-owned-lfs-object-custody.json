@@ -1,0 +1,20 @@
+{
+  "kind": "bare-cedar-fog.git-lfs-object-custody-law",
+  "id": "machine-owned-lfs-object-custody/v1",
+  "transferAgent": "@red-cup-engineering/cloudflare-r2-services-section/git-lfs-transfer-agent",
+  "binding": "git-lfs-object-custody.json",
+  "gitConfiguration": {
+    "lfs.standalonetransferagent": "r2-bare-cedar-fog",
+    "lfs.customtransfer.r2-bare-cedar-fog.path": "node",
+    "lfs.customtransfer.r2-bare-cedar-fog.args": "<absolute path to @red-cup-engineering/cloudflare-r2-services-section's scripts/git-lfs-r2-transfer-agent.mjs> --config=<this law's binding path, absolute>",
+    "lfs.customtransfer.r2-bare-cedar-fog.concurrent": "false"
+  },
+  "rule": "asset bytes are carried by the bucket bare-cedar-fog-git-lfs and addressed by their git-lfs object id; the monorepo carries pointers and all text. Because the agent is standalone, git-lfs contacts no LFS API server, so GitHub carries no asset bytes and meters no asset transfer. Objects are stored uncompressed, so a bucket object's SHA-256 equals its object id and any S3 client can verify custody without git-lfs.",
+  "credentialRule": "key material lives only in the repository .env, is read at invocation, and is passed to the agent through the environment rather than argv so it does not appear in a process listing; the access key is scoped to this one bucket and cannot enumerate the account.",
+  "supersededInterface": "the default GitHub LFS endpoint remains configured for lfs.<url>.access but carries nothing while standalonetransferagent is set; it is retained as rollback only.",
+  "unmigratedHistory": "binaries committed before this law stay as raw git blobs, because the working repository is a blobless partial clone and rewriting history would require refetching the whole blob history from the origin. Converting them is deferred, not refused.",
+  "leaderJudgment": [
+    "whether to de-partialize the clone and run git lfs migrate over existing history",
+    "bucket lifecycle and retention policy"
+  ]
+}

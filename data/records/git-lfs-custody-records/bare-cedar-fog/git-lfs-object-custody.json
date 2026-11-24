@@ -1,0 +1,16 @@
+{
+  "bucket": "bare-cedar-fog-git-lfs",
+  "region": "auto",
+  "endpointTemplate": "https://{accountId}.r2.cloudflarestorage.com",
+  "usePathStyle": true,
+  "rootPath": "",
+  "compression": "none",
+  "deleteOtherVersions": false,
+  "repositoryRoot": "/home/emsenn/bare-cedar-fog",
+  "credentialNames": {
+    "accountId": "CLOUDFLARE_R2_ACCOUNT_ID",
+    "accessKeyId": "CLOUDFLARE_R2_BARE_CEDAR_FOG_GIT_LFS_ACCESS_KEY_ID",
+    "secretAccessKey": "CLOUDFLARE_R2_BARE_CEDAR_FOG_GIT_LFS_ACCESS_KEY_SECRET"
+  },
+  "consumedBy": "@red-cup-engineering/cloudflare-r2-services-section/git-lfs-transfer-agent --config=<this file>"
+}
