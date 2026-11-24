@@ -1,0 +1,56 @@
+{
+  "name": "@red-cup-engineering/cloudflare-r2-engineering-services-section",
+  "version": "0.7.4-dev.0",
+  "type": "module",
+  "description": "Cloudflare R2 clients, custody operations, and free-tier admission.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/cloudflare-r2-engineering-services-section.git"
+  },
+  "exports": {
+    "./r2-sigv4": "./src/r2-sigv4.mjs",
+    "./r2-rest": "./src/r2-rest.mjs",
+    "./category-reference-index": "./src/category-reference-index.mjs",
+    "./add-category-reference": "./scripts/add-category-reference.mjs",
+    "./query-category-reference": "./scripts/query-category-reference.mjs",
+    "./immutable-content-custody": "./src/immutable-content-custody.mjs",
+    "./object-custody": "./src/r2-object-custody.js",
+    "./free-tier-admission": "./src/assay-cloudflare-r2-free-allowance.js",
+    "./git-lfs-transfer-agent": "./scripts/git-lfs-r2-transfer-agent.mjs",
+    "./directory-custody": "./src/r2-directory-custody.mjs",
+    "./lease": "./src/r2-lease.mjs",
+    "./custody-run": "./src/r2-custody-run.mjs"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "lib"
+  ],
+  "scripts": {
+    "check": "node --check src/r2-sigv4.mjs && node --check src/r2-rest.mjs && node --check src/category-reference-index.mjs && node --check src/immutable-content-custody.mjs && node --check src/r2-object-custody.js && node --check src/assay-cloudflare-r2-free-allowance.js && node --check scripts/git-lfs-r2-transfer-agent.mjs && node --check src/r2-directory-custody.mjs && node --check scripts/r2-directory-custody.mjs && node --check src/r2-lease.mjs && node --check src/r2-custody-run.mjs && node --check scripts/r2-custody-run.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "^0.3.5",
+    "@red-cup-engineering/computer-file-engineering-services-section": "^0.8.8",
+    "@red-cup-engineering/uri-engineering-services-section": "^0.1.7",
+    "@red-cup-engineering/category-reference-index-service": "^0.4.4",
+    "@red-cup-engineering/execute-javascript-node-command-service": "^0.4.3",
+    "@red-cup-engineering/git-engineering-services-section": "^0.4.3",
+    "@red-cup-engineering/immutable-content-custody-service": "^0.8.0",
+    "@red-cup-engineering/git-engine": "^0.1.10-dev.0",
+    "@red-cup-engineering/semiotic-content-address-system": "^0.1.7 || 0.1.8-dev.0"
+  },
+  "private": false,
+  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
+  },
+  "bin": {
+    "r2-directory-custody": "scripts/r2-directory-custody.mjs",
+    "r2-custody-run": "scripts/r2-custody-run.mjs"
+  }
+}
