@@ -1,12 +1,11 @@
+import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
 import { createHmac } from "node:crypto";
-import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 const SERVICE = "s3";
 const REGION = "auto";
 const EMPTY_SHA256 = sha256Hex("");
 
-function sha256(value) { return sha256Hex(value); }
-function hmac(key, value) { return createHmac("sha256", key).update(value).digest(); }
+function hmac(key, value) { return createHmac("sha256Hex", key).update(value).digest(); }
 function awsEncode(value) {
   return encodeURIComponent(value).replace(/[!'()*]/gu, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`);
 }
@@ -31,8 +30,8 @@ function authorization({ accessKeyId, secretAccessKey, method, path, query = "",
   const instant = amzInstant(now);
   const day = instant.slice(0, 8);
   const scope = `${day}/${REGION}/${SERVICE}/aws4_request`;
-  const stringToSign = ["AWS4-HMAC-SHA256", instant, scope, sha256(canonicalRequest)].join("\n");
-  const signature = createHmac("sha256", signingKey(secretAccessKey, day)).update(stringToSign).digest("hex");
+  const stringToSign = ["AWS4-HMAC-SHA256", instant, scope, sha256Hex(canonicalRequest)].join("\n");
+  const signature = createHmac("sha256Hex", signingKey(secretAccessKey, day)).update(stringToSign).digest("hex");
   return { value: `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`, instant, signedHeaders, signature, scope };
 }
 
@@ -85,7 +84,7 @@ export function createR2SigV4Client(configuration, {
     const now = clock();
     const signed = normalizedHeaders({
       host: new URL(origin).host,
-      "x-amz-content-sha256": payloadHash,
+      "x-amz-content-sha256Hex": payloadHash,
       "x-amz-date": amzInstant(now),
       ...(config.sessionToken === undefined ? {} : { "x-amz-security-token": config.sessionToken }),
       ...headers,
@@ -113,11 +112,11 @@ export function createR2SigV4Client(configuration, {
       mediaType: result.headers.get("content-type"),
       metadata: Object.freeze({
         objectId: result.headers.get("x-amz-meta-object-id"),
-        sha256: result.headers.get("x-amz-meta-sha256"),
+        sha256: result.headers.get("x-amz-meta-sha256Hex"),
         byteLength: result.headers.get("x-amz-meta-byte-length"),
         taskId: result.headers.get("x-amz-meta-task-id"),
         tenant: result.headers.get("x-amz-meta-tenant"),
-        contentSha256: result.headers.get("x-amz-meta-content-sha256"),
+        contentSha256: result.headers.get("x-amz-meta-content-sha256Hex"),
       }),
       body: method === "GET" ? Buffer.from(await result.arrayBuffer()) : undefined,
     });
@@ -134,7 +133,7 @@ export function createR2SigV4Client(configuration, {
         "if-none-match": "*",
         "x-amz-meta-byte-length": byteLength,
         "x-amz-meta-object-id": objectId,
-        "x-amz-meta-sha256": digest,
+        "x-amz-meta-sha256Hex": digest,
         "x-amz-storage-class": "STANDARD",
       },
     }),
@@ -148,10 +147,10 @@ export function createR2SigV4Client(configuration, {
         "content-type": mediaType,
         ...(etag == null ? { "if-none-match": "*" } : { "if-match": `\"${etag}\"` }),
         "x-amz-meta-byte-length": byteLength,
-        "x-amz-meta-sha256": digest,
+        "x-amz-meta-sha256Hex": digest,
         "x-amz-meta-task-id": taskId,
         "x-amz-meta-tenant": tenant,
-        "x-amz-meta-content-sha256": contentSha256,
+        "x-amz-meta-content-sha256Hex": contentSha256,
         "x-amz-storage-class": "STANDARD",
       },
     }),

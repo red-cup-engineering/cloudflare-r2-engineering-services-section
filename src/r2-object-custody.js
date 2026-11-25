@@ -1,5 +1,5 @@
+import { Sha256Stream } from "@red-cup-engineering/semiotic-content-address-system";
 import { constants, closeSync, createReadStream, fstatSync, lstatSync, openSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { isAbsolute, normalize, sep } from "node:path";
 
 export const CONTRACT = "cloudflare-r2-object-custody/v1";
@@ -59,9 +59,9 @@ export function validateStoreRequest(request, { now = new Date().toISOString(), 
 }
 
 async function digestDescriptor(descriptor) {
-  const hash = createHash("sha256");
+  const hash = new Sha256Stream();
   for await (const chunk of createReadStream("", { fd: descriptor, start: 0, autoClose: false })) hash.update(chunk);
-  return hash.digest("hex");
+  return hash.digestHex();
 }
 function remoteMatches(remote, expected) {
   return remote !== null

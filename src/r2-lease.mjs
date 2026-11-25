@@ -5,7 +5,6 @@ import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system"
 // its etag, so of any executors that try to take a free lease at once exactly one gets it. A holder that
 // stops renewing loses it when it lapses and any other executor may take it; whatever the late holder then
 // tries to retain is refused by directory ownership's own compare-and-swap, so a lapse never loses work.
-import { createHash } from "node:crypto";
 
 export const LEASE_KIND = "r2-lease/v1";
 const NAME = /^[a-z0-9][a-z0-9._-]{0,127}$/u;

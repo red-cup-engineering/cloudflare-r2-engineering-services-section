@@ -1,4 +1,4 @@
-import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
+import { sha256Hex, makeNiUri, verifyNiUri } from "@red-cup-engineering/semiotic-content-address-system";
 // A working directory kept in R2 by content, so the process that works in it can run on any machine.
 //
 // Every file is an immutable object named by its ni (the same keys immutable-content-custody uses); a
@@ -9,10 +9,9 @@ import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system"
 //
 // A local cache keyed like the bucket makes restoring on a machine that has run before nearly free, and
 // lets an ephemeral runner carry blobs between runs through any directory cache.
-import { createHash } from "node:crypto";
 import { chmodSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import { makeNiUri, verifyNiUri } from "@red-cup-engineering/uri-engineering-services-section/ni-uri";
+
 import { immutableContentKey } from "@red-cup-engineering/immutable-content-custody-service";
 
 export const MANIFEST_KIND = "r2-directory-custody.manifest/v1";
